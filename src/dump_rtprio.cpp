@@ -284,6 +284,8 @@ void read_status(int process, int ppid, int* pgrp, std::string* name,
 }  // namespace
 
 int main() {
+  std::printf("exe,name,cpumask,policy,nice,priority,tid,pid,ppid,sid,cpu\n");
+
   const int pid_max = find_pid_max();
   const cpu_set_t all_cpus = find_all_cpus();
 
