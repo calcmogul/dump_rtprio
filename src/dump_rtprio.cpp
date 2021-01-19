@@ -78,7 +78,7 @@ const char* policy_string(uint32_t policy) {
   }
 }
 
-::std::string strip_string_prefix(size_t length, ::std::string str) {
+std::string strip_string_prefix(size_t length, std::string str) {
   str = str.substr(length);
   while (str[0] == ' ' || str[0] == '\t') {
     str = str.substr(1);
@@ -148,8 +148,8 @@ int find_scheduler(int process, bool* not_there) {
   return scheduler;
 }
 
-::std::string find_exe(int process, bool* not_there) {
-  ::std::string exe_filename = "/proc/" + ::std::to_string(process) + "/exe";
+std::string find_exe(int process, bool* not_there) {
+  std::string exe_filename = "/proc/" + std::to_string(process) + "/exe";
   char exe_buffer[1024];
   ssize_t exe_size =
       readlink(exe_filename.c_str(), exe_buffer, sizeof(exe_buffer));
@@ -164,7 +164,7 @@ int find_scheduler(int process, bool* not_there) {
       PLOG(FATAL, "readlink(%s, %p, %zu)", exe_filename.c_str(), exe_buffer,
            sizeof(exe_buffer));
     }
-    return ::std::string(exe_buffer, exe_size);
+    return std::string(exe_buffer, exe_size);
   }
 }
 
@@ -182,7 +182,7 @@ int find_nice_value(int process, bool* not_there) {
 }
 
 void read_stat(int process, int* ppid, int* sid, bool* not_there) {
-  ::std::string stat_filename = "/proc/" + ::std::to_string(process) + "/stat";
+  std::string stat_filename = "/proc/" + std::to_string(process) + "/stat";
   std::FILE* stat = std::fopen(stat_filename.c_str(), "r");
   if (stat == nullptr && errno == ENOENT) {
     *not_there = true;
@@ -217,16 +217,16 @@ void read_stat(int process, int* ppid, int* sid, bool* not_there) {
       if (buffer[i] == ')')
         --parens;
     } else if (buffer[i] == ' ') {
-      ::std::string field_string(buffer, field_start, i - field_start);
+      std::string field_string(buffer, field_start, i - field_start);
       switch (field) {
         case 0:
-          pid = ::std::stoi(field_string);
+          pid = std::stoi(field_string);
           break;
         case 3:
-          *ppid = ::std::stoi(field_string);
+          *ppid = std::stoi(field_string);
           break;
         case 4:
-          *sid = ::std::stoi(field_string);
+          *sid = std::stoi(field_string);
           break;
         default:
           break;
@@ -243,10 +243,9 @@ void read_stat(int process, int* ppid, int* sid, bool* not_there) {
   CHECK_EQ(pid, process);
 }
 
-void read_status(int process, int ppid, int* pgrp, ::std::string* name,
+void read_status(int process, int ppid, int* pgrp, std::string* name,
                  bool* not_there) {
-  ::std::string status_filename =
-      "/proc/" + ::std::to_string(process) + "/status";
+  std::string status_filename = "/proc/" + std::to_string(process) + "/status";
   std::FILE* status = std::fopen(status_filename.c_str(), "r");
   if (status == nullptr && errno == ENOENT) {
     *not_there = true;
@@ -266,15 +265,15 @@ void read_status(int process, int ppid, int* pgrp, ::std::string* name,
         break;
       }
     }
-    ::std::string line(buffer);
+    std::string line(buffer);
     if (line.substr(0, 5) == "Name:") {
       *name = strip_string_prefix(5, line);
     } else if (line.substr(0, 4) == "Pid:") {
-      pid = ::std::stoi(strip_string_prefix(4, line));
+      pid = std::stoi(strip_string_prefix(4, line));
     } else if (line.substr(0, 5) == "PPid:") {
-      status_ppid = ::std::stoi(strip_string_prefix(5, line));
+      status_ppid = std::stoi(strip_string_prefix(5, line));
     } else if (line.substr(0, 5) == "Tgid:") {
-      *pgrp = ::std::stoi(strip_string_prefix(5, line));
+      *pgrp = std::stoi(strip_string_prefix(5, line));
     }
   }
   PCHECK(std::fclose(status));
@@ -294,14 +293,14 @@ int main() {
     const cpu_set_t cpu_mask = find_cpu_mask(i, &not_there);
     const sched_param param = find_sched_param(i, &not_there);
     const int scheduler = find_scheduler(i, &not_there);
-    const ::std::string exe = find_exe(i, &not_there);
+    const std::string exe = find_exe(i, &not_there);
     const int nice_value = find_nice_value(i, &not_there);
 
     int ppid = 0, sid = 0;
     read_stat(i, &ppid, &sid, &not_there);
 
     int pgrp = 0;
-    ::std::string name;
+    std::string name;
     read_status(i, ppid, &pgrp, &name, &not_there);
 
     if (not_there)
