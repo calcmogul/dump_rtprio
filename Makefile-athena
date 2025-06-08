@@ -1,9 +1,9 @@
 EXEC := dump_rtprio
 
-CPP := arm-frc2024-linux-gnueabi-g++
-CPPFLAGS := -O3 -Wall -s -std=c++20 -flto
+CPP := arm-frc2025-linux-gnueabi-g++
+CPPFLAGS := -O2 -Wall -Wextra -Werror -pedantic -std=c++20 -flto
 
-LD := arm-frc2024-linux-gnueabi-g++
+LD := arm-frc2025-linux-gnueabi-g++
 LDFLAGS :=
 
 SRCDIR := src
@@ -18,15 +18,15 @@ OBJ := $(addprefix $(OBJDIR)/,$(SRC:.cpp=.o))
 .PHONY: all
 all: $(OBJDIR)/$(EXEC)
 
--include $(CPP_OBJ:.o=.d)
+-include $(OBJ:.o=.d)
 
 $(OBJDIR)/$(EXEC): $(OBJ)
 	@mkdir -p $(@D)
-	@$(LD) $+ $(LDFLAGS) -o $@
+	$(LD) $+ $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
-	@$(CPP) $(CPPFLAGS) -MMD -c -o $@ $<
+	$(CPP) $(CPPFLAGS) -MMD -c -o $@ $<
 
 .PHONY: clean
 clean:

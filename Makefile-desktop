@@ -22,11 +22,11 @@ all: $(OBJDIR)/$(EXEC)
 
 $(OBJDIR)/$(EXEC): $(OBJ)
 	@mkdir -p $(@D)
-	@$(LD) $+ $(LDFLAGS) -o $@
+	$(LD) $+ $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
-	@$(CPP) $(CPPFLAGS) -MMD -c -o $@ $<
+	$(CPP) $(CPPFLAGS) -MMD -c -o $@ $<
 
 .PHONY: clean
 clean:
