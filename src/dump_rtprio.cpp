@@ -1,3 +1,5 @@
+// Copyright (c) Tyler Veness
+
 // This is a utility program that prints out real-time priorities for processes
 // on a system. It is useful both because the standard tools don't format that
 // information very well and the roboRIO's busybox ones don't seem to do it at
@@ -231,13 +233,16 @@ void read_stat(int process, int* ppid, int* sid, bool* not_there) {
   size_t field_start = 0;
   int parens = 0;
   for (size_t i = 0; i < sizeof(buffer); ++i) {
-    if (buffer[i] == '\0')
+    if (buffer[i] == '\0') {
       break;
-    if (buffer[i] == '(')
+    }
+    if (buffer[i] == '(') {
       ++parens;
+    }
     if (parens > 0) {
-      if (buffer[i] == ')')
+      if (buffer[i] == ')') {
         --parens;
+      }
     } else if (buffer[i] == ' ') {
       std::string_view field_string{buffer + field_start, i - field_start};
       switch (field) {
